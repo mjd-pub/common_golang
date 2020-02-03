@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"common_golang/utils"
+	"github.com/mjd-pub/common_golang/utils"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -44,6 +44,9 @@ func HttpRequest(method string, uri string, body Body, header map[string]string,
 			panic(err)
 		}
 		resp, err = client.Do(request)
+		if err != nil {
+			panic(err)
+		}
 	case "POST":
 		dconf, _ := json.Marshal(body["dconf"])
 		apiType, _ := body["type"].(string)
@@ -64,6 +67,9 @@ func HttpRequest(method string, uri string, body Body, header map[string]string,
 			}
 		}
 		resp, err = client.Do(request)
+		if err != nil {
+			panic(err)
+		}
 	default:
 		panic(errors.New("inner unsupported "+method))
 	}

@@ -6,7 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/streadway/amqp"
-	"common_golang/utils"
+	"github.com/mjd-pub/common_golang/utils"
 	"log"
 	"sync"
 	"time"
