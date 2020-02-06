@@ -14,7 +14,7 @@ import (
 
 const (
 	Ks3EndPoint     = "kss.ksyun.com"
-	CdnAddr         = "cdn.mioji.com"
+	CdnAddr         = "cdn.magicdmc.com"
 )
 
 type Ks3 struct {
