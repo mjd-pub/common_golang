@@ -57,6 +57,6 @@ func (k *Ks3) UploadFileByByte(bucket string, uploadPath string, resource []byte
 	if err != nil {
 		return "", err
 	}
-	url := "https://" + bucket + "." + CdnAddr + "/" + uploadPath
+	url := "https://" + bucket + "-" + CdnAddr + "/" + uploadPath
 	return url, nil
 }
