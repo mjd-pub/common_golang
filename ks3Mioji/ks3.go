@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	Ks3EndPoint     = "kss.ksyun.com"
+	Ks3EndPoint     = "ks3-cn-beijing.ksyun.com"
 	CdnAddr         = "cdn.magicdmc.com"
 )
 
