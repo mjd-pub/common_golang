@@ -52,9 +52,12 @@ func HttpRequest(method string, uri string, body Body, header map[string]string,
 		apiType, _ := body["type"].(string)
 		qid, _ := body["qid"].(string)
 		uid, _ := body["uid"].(string)
+		csuid, _ := body["csuid"].(string)
+		ptid, _ := body["ptid"].(string)
 		bodyData, _ := json.Marshal(body) //格式化body
 		reader := bytes.NewReader(bodyData)
-		reqUrl = uri + fmt.Sprintf("?type=%s&qid=%s&uid=%s&dconf=%s", apiType, qid, uid, dconf)
+		reqUrl = uri + fmt.Sprintf("?type=%s&qid=%s&uid=%s&dconf=%s&csuid=%s&ptid=%s",
+			apiType, qid, uid, dconf, csuid, ptid)
 		request, err := http.NewRequest("POST", reqUrl, reader)
 		if err != nil {
 			panic(err)
