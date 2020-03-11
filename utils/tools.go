@@ -5,6 +5,7 @@
 package utils
 
 import (
+	"encoding/json"
 	"net"
 	"errors"
 )
@@ -30,4 +31,13 @@ func GetLocalHostIp() (string, error) {
 		}
 	}
 	return "", errors.New("获取ip失败")
+}
+
+// json化数据
+func JsonEncode(v interface{}) (string, error) {
+	jsonByte, err := json.Marshal(v)
+	if err != nil {
+		return "", err
+	}
+	return string(jsonByte), nil
 }
