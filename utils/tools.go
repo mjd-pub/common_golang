@@ -6,8 +6,10 @@ package utils
 
 import (
 	"encoding/json"
+	"math/rand"
 	"net"
 	"errors"
+	"time"
 )
 
 // GLocalHostIp 获取本地ip
@@ -40,4 +42,21 @@ func JsonEncode(v interface{}) (string, error) {
 		return "", err
 	}
 	return string(jsonByte), nil
+}
+
+//产生随机字符串，不长于32位
+func GetNonceStr() string {
+	//随机种子
+	rand.Seed(time.Now().UnixNano())
+	//随机选取的字符串
+	chars := "abcdefghijklmnopqrstuvwxyz0123456789"
+	str := ""
+	//生成字符串
+	for i := 0; i < 32; i++ {
+		s := rand.Intn(len(chars) - 1)
+		temp := string(chars[s])
+		str += temp
+	}
+	//返回值字符串
+	return str
 }
