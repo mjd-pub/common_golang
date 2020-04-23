@@ -87,7 +87,7 @@ func NewCompanyPayClient(appid, mchid, key, apiclientKey, apiclientCert string) 
  * @params amount:int 金额(单位:分)
  * @return CompanyPayRequest
  */
-func (companyPay *CompanyPay) CompanyPayNewCompanyPayRequest(businessId string, amount int, openid string, desc string) CompanyPayRequest {
+func (companyPay *CompanyPay) NewCompanyPayRequest(businessId string, amount int, openid string, desc string) CompanyPayRequest {
 	return CompanyPayRequest{
 		MchAppid:       companyPay.wechatPay.appid,
 		Mchid:          companyPay.wechatPay.mchid,
