@@ -110,7 +110,7 @@ func (h5Pay *H5Pay) NewH5PayRequest(body, detail, orderId, userIp, notifyUrl, op
  */
 func (h5Pay *H5Pay) Pay(request H5PayRequest) (h5Resp *H5PayRespones, err error) {
 	// 向微信发送请求
-	resp, err := h5Pay.wechatPay.Request(COMPANY_PAY, request)
+	resp, err := h5Pay.wechatPay.Request(UNIFIED_ORDER, request)
 	if err != nil {
 		return nil, errors.New("请求异常:" + err.Error())
 	}
