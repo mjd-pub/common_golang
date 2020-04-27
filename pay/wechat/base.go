@@ -163,6 +163,13 @@ type PayNotifyRequest struct {
 	TimeEnd            string `json:"time_end" xml:"time_end, omitempty" structs:"time_end, omitempty"`
 }
 
+// ServiceNotifyResponse 服务器主动回复微信
+type ServiceNotifyResponse struct {
+	XMLName    xml.Name `xml:"xml"`
+	ReturnCode string   `xml:"return_code"`
+	ReturnMsg  string   `xml:"return_msg"`
+}
+
 /**
  * newWechatPay 微信支付初始化
  * @params appid 商户号绑定的appid
