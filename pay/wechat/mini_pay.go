@@ -168,6 +168,44 @@ type MiniPayRefundRespones struct {
 	ConponRefundId1     string `json:"conpon_refund_id_1,omitempty" xml:"conpon_refund_id_1,omitempty"`
 }
 
+type MiniPayRefundQueryRequests struct {
+	AppId         string `json:"app_id" xml:"app_id"`
+	MchId         string `json:"mch_id" xml:"mch_id"`
+	NonceStr      string `json:"nonce_str" xml:"nonce_str"`
+	SignType      string `json:"sign_type" xml:"sign_type"`
+	TransactionId string `json:"transaction_id" xml:"transaction_id"`
+	OutTradeNo    string `json:"out_trade_no" xml:"out_trade_no"`
+	OutRefundNo   string `json:"out_refund_no" xml:"out_refund_no"`
+	RefundId      string `json:"refund_id" xml:"refund_id"`
+	Offset        int    `json:"offset" xml:"offset"`
+}
+
+type MiniPayRefundQueryRespones struct {
+	ReturnCode          string `json:"return_code,omitempty" xml:"return_code,omitempty"`
+	ReturnMsg           string `json:"return_msg,omitempty" xml:"return_msg,omitempty"`
+	ResultCode          string `json:"result_code,omitempty" xml:"result_code,omitempty"`
+	ErrCode             string `json:"err_code,omitempty" xml:"err_code,omitempty"`
+	ErrCodeDes          string `json:"err_code_des,omitempty" xml:"err_code_des,omitempty"`
+	Appid               string `json:"appid,omitempty" xml:"appid,omitempty"`
+	MchId               string `json:"mch_id,omitempty" xml:"mch_id,omitempty"`
+	NonceStr            string `json:"nonce_str,omitempty" xml:"nonce_str,omitempty"`
+	Sign                string `json:"sign,omitempty" xml:"sign,omitempty"`
+	TotalRefundCount    int    `json:"total_refund_count,omitempty" xml:"total_refund_count,omitempty"`
+	TransactionId       string `xml:"transaction_id,omitempty" json:"transaction_id,omitempty"`
+	OutTradeNo          string `xml:"out_trade_no,omitempty" json:"out_trade_no,omitempty"`
+	TotalFee            int    `json:"total_fee,omitempty" xml:"total_fee,omitempty"`
+	SettlementTotalFree int    `json:"settlement_total_free,omitempty" xml:"settlement_total_free,omitempty"`
+	FreeType            string `json:"free_type,omitempty" xml:"free_type,omitempty"`
+	CashFee             int    `xml:"cash_fee,omitempty" json:"cash_fee,omitempty"`
+	RefundCount         int    `json:"refund_count,omitempty" xml:"refund_count,omitempty"`
+	OutRefundNo0        string `xml:"out_refund_no_0,omitempty" json:"out_refund_no_0,omitempty"`
+	RefundId0           string `json:"refund_id_0,omitempty" xml:"refund_id_0,omitempty"`
+	RefundFee0          int    `json:"refund_fee_0,omitempty" xml:"refund_fee_0,omitempty"`
+	
+
+
+}
+
 func NewMiniPayClient(appid, mchid, key, apiclientKey, apiclientCert string) *MiniPay {
 	wechatPay := newWechatPay(appid, mchid, key, apiclientKey, apiclientCert)
 	return &MiniPay{
@@ -223,7 +261,7 @@ func (h5Pay *H5Pay) NewMiniPayRequest(body, detail, orderId, userIp, notifyUrl, 
  * Pay 发起支付
  *
  * @params request MiniPayRequest
- * @return miniResp err
+ * @return MiniPayRespones error
  */
 func (miniPay *MiniPay) Pay(request MiniPayRequest) (miniResp *MiniPayRespones, err error) {
 	// 向微信发送请求
