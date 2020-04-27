@@ -17,22 +17,22 @@ type H5Pay struct {
 
 // H5PayRequests h5支付请求参数
 type H5PayRequest struct {
-	Appid          string `json:"appid" xml:"appid"`
-	MchId          string `json:"mch_id" xml:"mch_id"`
-	NonceStr       string `json:"nonce_str" xml:"nonce_str"`
-	SignType       string `json:"sign_type" xml:"sign_type"`
-	Body           string `json:"body" xml:"body"`
-	Detail         string `json:"detail" xml:"detail"`
-	OutTradeNo     string `json:"out_trade_no" xml:"out_trade_no"`
-	FeeType        string `json:"fee_type" xml:"fee_type"`
-	TotalFee       int    `json:"total_fee" xml:"total_fee"`
-	SpbillCreateIp string `json:"spbill_create_ip" xml:"spbill_create_ip"`
-	TimeStart      string `json:"time_start" xml:"time_start"`
-	TimeExpire     int64  `json:"time_expire" xml:"time_expire"`
-	NotifyUrl      string `json:"notify_url" xml:"notify_url"`
-	TradeType      string `json:"trade_type" xml:"trade_type"`
-	Openid         string `json:"openid" xml:"openid"`
-	SceneInfo      string `json:"scene_info" xml:"scene_info"`
+	Appid          string `json:"appid" xml:"appid" structs:"appid"`
+	MchId          string `json:"mch_id" xml:"mch_id" structs:"mch_id"`
+	NonceStr       string `json:"nonce_str" xml:"nonce_str" structs:"nonce_str"`
+	SignType       string `json:"sign_type" xml:"sign_type" structs:"sign_type"`
+	Body           string `json:"body" xml:"body" structs:"body"`
+	Detail         string `json:"detail" xml:"detail" structs:"detail"`
+	OutTradeNo     string `json:"out_trade_no" xml:"out_trade_no" structs:"out_trade_no"`
+	FeeType        string `json:"fee_type" xml:"fee_type" structs:"fee_type"`
+	TotalFee       int    `json:"total_fee" xml:"total_fee" structs:"total_fee"`
+	SpbillCreateIp string `json:"spbill_create_ip" xml:"spbill_create_ip" structs:"spbill_create_ip"`
+	TimeStart      string `json:"time_start" xml:"time_start" structs:"time_start"`
+	TimeExpire     int64  `json:"time_expire" xml:"time_expire" structs:"time_expire"`
+	NotifyUrl      string `json:"notify_url" xml:"notify_url" structs:"notify_url"`
+	TradeType      string `json:"trade_type" xml:"trade_type" structs:"trade_type"`
+	Openid         string `json:"openid" xml:"openid" structs:"openid"`
+	SceneInfo      string `json:"scene_info" xml:"scene_info" structs:"scene_info"`
 }
 
 // H5PayRespones h5支付请求返回参数
@@ -110,7 +110,7 @@ func (h5Pay *H5Pay) NewH5PayRequest(body, detail, orderId, userIp, notifyUrl, op
  */
 func (h5Pay *H5Pay) Pay(request H5PayRequest) (h5Resp *H5PayRespones, err error) {
 	// 向微信发送请求
-	resp, err := h5Pay.wechatPay.Request(COMPANY_PAY, request)
+	resp, err := h5Pay.wechatPay.Request(UNIFIED_ORDER, request)
 	if err != nil {
 		return nil, errors.New("请求异常:" + err.Error())
 	}
@@ -122,7 +122,7 @@ func (h5Pay *H5Pay) Pay(request H5PayRequest) (h5Resp *H5PayRespones, err error)
 		return nil, err
 	}
 	//xml解码
-	err = xml.Unmarshal(respData, h5Resp)
+	err = xml.Unmarshal(respData, &h5Resp)
 	if err != nil {
 		return nil, err
 	}
