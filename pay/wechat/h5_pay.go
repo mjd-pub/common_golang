@@ -53,7 +53,7 @@ type H5PayRespones struct {
 }
 
 func NewH5PayClient(appid, mchid, key, apiclientKey, apiclientCert string) *H5Pay {
-	wechatPay := newWechatPay(appid, mchid, key, apiclientKey, apiclientCert)
+	wechatPay := NewWechatPay(appid, mchid, key, apiclientKey, apiclientCert)
 	return &H5Pay{
 		wechatPay: wechatPay,
 	}

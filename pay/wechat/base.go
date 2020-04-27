@@ -4,12 +4,15 @@ import (
 	"crypto/md5"
 	"crypto/tls"
 	"crypto/x509"
+	"encoding/xml"
 	"errors"
 	"fmt"
 	"github.com/fatih/structs"
 	"github.com/mjd-pub/common_golang/utils"
 	"io"
+	"io/ioutil"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -39,6 +42,96 @@ type wechatPay struct {
 	mchid         string
 }
 
+// RefundRequests 微信申请退款请求参数
+type RefundRequests struct {
+	Appid         string `json:"appid" xml:"appid" structs:"appid"`
+	MchId         string `json:"mch_id" xml:"mch_id" structs:"mch_id"`
+	TransactionId string `json:"transaction_id" xml:"transaction_id" structs:"transaction_id"`
+	OutTradeNo    string `json:"out_trade_no" xml:"out_trade_no" structs:"out_trade_no"`
+	NonceStr      string `json:"nonce_str" xml:"nonce_str" structs:"nonce_str"`
+	SignType      string `json:"sign_type" xml:"sign_type" structs:"sign_type"`
+	OutRefundNo   string `json:"out_refund_no" xml:"out_refund_no" structs:"out_refund_no"`
+	TotalFee      int    `json:"total_fee" xml:"total_fee" structs:"total_fee"`
+	RefundFee     int    `json:"refund_fee" xml:"refund_fee" structs:"refund_fee"`
+	RefundFeeType string `json:"refund_fee_type" xml:"refund_fee_type" structs:"refund_fee_type"`
+	RefundDesc    string `json:"refund_desc" xml:"refund_desc" structs:"refund_desc"`
+	RefundAccount string `json:"refund_account" xml:"refund_account" structs:"refund_account"`
+	NotifyUrl     string `json:"notify_url" xml:"notify_url" structs:"notify_url"`
+}
+
+// RefundRespones 微信申请退款请求返回参数
+type RefundRespones struct {
+	ReturnCode          string `json:"return_code,omitempty" xml:"return_code,omitempty" structs:"return_code"`
+	ReturnMsg           string `json:"return_msg,omitempty" xml:"return_msg,omitempty" structs:"return_msg"`
+	ResultCode          string `json:"result_code,omitempty" xml:"result_code,omitempty" structs:"result_code"`
+	ErrCode             string `json:"err_code,omitempty" xml:"err_code,omitempty" structs:"err_code"`
+	ErrCodeDes          string `json:"err_code_des,omitempty" xml:"err_code_des,omitempty" structs:"err_code_des"`
+	Appid               string `json:"appid,omitempty" xml:"appid,omitempty" structs:"appid"`
+	MchId               string `json:"mch_id,omitempty" xml:"mch_id,omitempty" structs:"mch_id"`
+	NonceStr            string `json:"nonce_str,omitempty" xml:"nonce_str,omitempty" structs:"nonce_str"`
+	Sign                string `json:"sign,omitempty" xml:"sign,omitempty" structs:"sign"`
+	TransactionId       string `xml:"transaction_id,omitempty" json:"transaction_id,omitempty" structs:"transaction_id"`
+	OutTradeNo          string `xml:"out_trade_no,omitempty" json:"out_trade_no,omitempty" structs:"out_trade_no"`
+	OutRefundNo         string `xml:"out_refund_no,omitempty" json:"out_refund_no,omitempty" structs:"out_refund_no"`
+	RefundId            string `json:"refund_id,omitempty" xml:"refund_id,omitempty" structs:"refund_id"`
+	RefundFee           int    `json:"refund_fee,omitempty" xml:"refund_fee,omitempty" structs:"refund_fee"`
+	SettlementTotalFree int    `json:"settlement_total_free,omitempty" xml:"settlement_total_free,omitempty" structs:"settlement_total_free"`
+	FreeType            string `json:"free_type,omitempty" xml:"free_type,omitempty" structs:"free_type"`
+	CashFee             int    `xml:"cash_fee,omitempty" json:"cash_fee,omitempty" structs:"cash_fee"`
+	CashFeeType         string `xml:"cash_fee_type,omitempty" json:"cash_fee_type,omitempty" structs:"cash_fee_type"`
+	CashRefundFee       int    `json:"cash_refund_fee,omitempty" xml:"cash_refund_fee,omitempty" structs:"cash_refund_fee"`
+	CouponType0         string `json:"coupon_type_0,omitempty" xml:"coupon_type_0,omitempty" structs:"coupon_type_0"`
+	CouponRefundFee     int    `json:"coupon_refund_fee,omitempty" xml:"coupon_refund_fee,omitempty" structs:"coupon_refund_fee"`
+	CouponRefundFee0    int    `json:"coupon_refund_fee_0,omitempty" xml:"coupon_refund_fee_0,omitempty" structs:"coupon_refund_fee_0"`
+	ConponRefundCount   int    `json:"conpon_refund_count,omitempty" xml:"conpon_refund_count,omitempty" structs:"conpon_refund_count"`
+	ConponRefundId0     string `json:"conpon_refund_id_0,omitempty" xml:"conpon_refund_id_0,omitempty" structs:"conpon_refund_id_0"`
+}
+
+type RefundQueryRequests struct {
+	AppId         string `json:"app_id" xml:"app_id" structs:"app_id"`
+	MchId         string `json:"mch_id" xml:"mch_id" structs:"mch_id"`
+	NonceStr      string `json:"nonce_str" xml:"nonce_str" structs:"nonce_str"`
+	SignType      string `json:"sign_type" xml:"sign_type" structs:"sign_type"`
+	TransactionId string `json:"transaction_id" xml:"transaction_id" structs:"transaction_id"`
+	OutTradeNo    string `json:"out_trade_no" xml:"out_trade_no" structs:"out_trade_no"`
+	OutRefundNo   string `json:"out_refund_no" xml:"out_refund_no" structs:"out_refund_no"`
+	RefundId      string `json:"refund_id" xml:"refund_id" structs:"refund_id"`
+	Offset        int    `json:"offset" xml:"offset" structs:"offset"`
+}
+
+type RefundQueryRespones struct {
+	ReturnCode           string `json:"return_code,omitempty" xml:"return_code,omitempty" structs:"return_code"`
+	ReturnMsg            string `json:"return_msg,omitempty" xml:"return_msg,omitempty" structs:"return_msg"`
+	ResultCode           string `json:"result_code,omitempty" xml:"result_code,omitempty" structs:"result_code"`
+	ErrCode              string `json:"err_code,omitempty" xml:"err_code,omitempty" structs:"err_code"`
+	ErrCodeDes           string `json:"err_code_des,omitempty" xml:"err_code_des,omitempty" structs:"err_code_des"`
+	Appid                string `json:"appid,omitempty" xml:"appid,omitempty" structs:"appid"`
+	MchId                string `json:"mch_id,omitempty" xml:"mch_id,omitempty" structs:"mch_id"`
+	NonceStr             string `json:"nonce_str,omitempty" xml:"nonce_str,omitempty" structs:"nonce_str"`
+	Sign                 string `json:"sign,omitempty" xml:"sign,omitempty" structs:"sign"`
+	TotalRefundCount     int    `json:"total_refund_count,omitempty" xml:"total_refund_count,omitempty" structs:"total_refund_count"`
+	TransactionId        string `xml:"transaction_id,omitempty" json:"transaction_id,omitempty" structs:"transaction_id"`
+	OutTradeNo           string `xml:"out_trade_no,omitempty" json:"out_trade_no,omitempty" structs:"out_trade_no"`
+	TotalFee             int    `json:"total_fee,omitempty" xml:"total_fee,omitempty" structs:"total_fee"`
+	SettlementTotalFree  int    `json:"settlement_total_free,omitempty" xml:"settlement_total_free,omitempty" structs:"settlement_total_free"`
+	FreeType             string `json:"free_type,omitempty" xml:"free_type,omitempty" structs:"free_type"`
+	CashFee              int    `xml:"cash_fee,omitempty" json:"cash_fee,omitempty" structs:"cash_fee"`
+	RefundCount          int    `json:"refund_count,omitempty" xml:"refund_count,omitempty" structs:"refund_count"`
+	OutRefundNo0         string `xml:"out_refund_no_0,omitempty" json:"out_refund_no_0,omitempty" structs:"out_refund_no_0"`
+	RefundId0            string `json:"refund_id_0,omitempty" xml:"refund_id_0,omitempty" structs:"refund_id_0"`
+	RefundFee0           int    `json:"refund_fee_0,omitempty" xml:"refund_fee_0,omitempty" structs:"refund_fee_0"`
+	SettleMentRefundFee0 int    `json:"settle_ment_refund_fee_0" xml:"settle_ment_refund_fee_0" structs:"settle_ment_refund_fee_0"`
+	CouponType00         string `json:"coupon_type_0_0" xml:"coupon_type_0_0" structs:"coupon_type_0_0"`
+	ConponRefundFee0     int    `json:"conpon_refund_fee_0" xml:"conpon_refund_fee_0" structs:"conpon_refund_fee_0"`
+	ConponRefundCount0   int    `json:"conpon_refund_count_0" xml:"conpon_refund_count_0" structs:"conpon_refund_count_0"`
+	ConponRefundId00     string `json:"conpon_refund_id_0_0" xml:"conpon_refund_id_0_0" structs:"conpon_refund_id_0_0"`
+	ConponRefundFee00    string `json:"conpon_refund_fee_0_0" xml:"conpon_refund_fee_0_0" structs:"conpon_refund_fee_0_0"`
+	RefundStatus0        string `json:"refund_status_0" xml:"refund_status_0" structs:"refund_status_0"`
+	RefundAccount0       string `json:"refund_account_0" xml:"refund_account_0" structs:"refund_account_0"`
+	RefundRecvAccount0   string `json:"refund_recv_account_0" xml:"refund_recv_account_0" structs:"refund_recv_account_0"`
+	RefundSuccessTime0   string `json:"refund_success_time_0" xml:"refund_success_time_0" structs:"refund_success_time_0"`
+}
+
 /**
  * newWechatPay 微信支付初始化
  * @params appid 商户号绑定的appid
@@ -47,7 +140,7 @@ type wechatPay struct {
  * @params apiclientKey
  * @params apiclientCert
  */
-func newWechatPay(appid, mchid, key, apiclientKey, apiclientCert string) *wechatPay {
+func NewWechatPay(appid, mchid, key, apiclientKey, apiclientCert string) *wechatPay {
 	return &wechatPay{
 		apiclientCert: apiclientCert,
 		apiclientKey:  apiclientKey,
@@ -91,6 +184,60 @@ func (wechat *wechatPay) Request(uri string, requestData interface{}) (resp *htt
 	client := &http.Client{Transport: tr}
 	//请求微信接口
 	resp, err = client.Post(uri, "text/xml; charset=UTF8", strings.NewReader(respXml))
+	return
+}
+
+/**
+ * Refund 小程序申请退款
+ *
+ * @params request AppletPayRefundRequests
+ * @return AppletPayRefundRespones err
+ */
+func (wechatPay *wechatPay) Refund(request RefundRequests) (queryResponse *RefundRespones, err error) {
+	// 向微信发送请求
+	resp, err := wechatPay.Request(REFUND, request)
+	if err != nil {
+		return nil, errors.New("请求异常:" + err.Error())
+	}
+	if resp.StatusCode != 200 {
+		return nil, errors.New("httpCode Err:" + strconv.Itoa(resp.StatusCode))
+	}
+	respData, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	//xml解码
+	err = xml.Unmarshal(respData, queryResponse)
+	if err != nil {
+		return nil, err
+	}
+	return
+}
+
+/**
+ * RefundQuery 小程序退款查询
+ *
+ * @params request AppletPayRefundQueryRequests
+ * @return AppletPayRefundQueryRespones err
+ */
+func (wechatPay *wechatPay) RefundQuery(request RefundQueryRequests) (queryResponse *RefundQueryRespones, err error) {
+	// 向微信发送请求
+	resp, err := wechatPay.Request(REFEUN_QUERY, request)
+	if err != nil {
+		return nil, errors.New("请求异常:" + err.Error())
+	}
+	if resp.StatusCode != 200 {
+		return nil, errors.New("httpCode Err:" + strconv.Itoa(resp.StatusCode))
+	}
+	respData, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	//xml解码
+	err = xml.Unmarshal(respData, queryResponse)
+	if err != nil {
+		return nil, err
+	}
 	return
 }
 

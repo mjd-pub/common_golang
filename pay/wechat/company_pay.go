@@ -73,7 +73,7 @@ type CompanyPayResponse struct {
 
 // NewCompanyPayClient 构造基础连接
 func NewCompanyPayClient(appid, mchid, key, apiclientKey, apiclientCert string) (companyPay *CompanyPay) {
-	wechatPay := newWechatPay(appid, mchid, key, apiclientKey, apiclientCert)
+	wechatPay := NewWechatPay(appid, mchid, key, apiclientKey, apiclientCert)
 	companyPay = &CompanyPay{
 		wechatPay: wechatPay,
 	}
