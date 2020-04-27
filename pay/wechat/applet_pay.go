@@ -1,7 +1,6 @@
 package wechat
 
 import (
-	"encoding/json"
 	"encoding/xml"
 	"errors"
 	"github.com/mjd-pub/common_golang/utils"
@@ -138,20 +137,10 @@ func NewAppletPayClient(appid, mchid, key, apiclientKey, apiclientCert string) *
  *
  * @return NewAppletPayRequest
  */
-func (h5Pay *H5Pay) NewAppletPayRequest(body, detail, orderId, userIp, notifyUrl, openid string, price float64) AppletPayRequest {
-	//scene_info
-	scene_info := map[string]interface{}{
-		"store_info": map[string]interface{}{
-			"id":        "门店id",
-			"name":      "门店名称",
-			"area_code": "门店行政区划码",
-			"address":   "门店详细地址",
-		},
-	}
-	sceneInfo, _ := json.Marshal(scene_info)
+func (appletPay *AppletPay) NewAppletPayRequest(body, detail, orderId, userIp, notifyUrl, openid string, price float64) AppletPayRequest {
 	return AppletPayRequest{
-		Appid:          h5Pay.wechatPay.appid,
-		MchId:          h5Pay.wechatPay.mchid,
+		Appid:          appletPay.wechatPay.appid,
+		MchId:          appletPay.wechatPay.mchid,
 		NonceStr:       utils.GetNonceStr(),
 		SignType:       "MD5",
 		Body:           body,
@@ -165,7 +154,7 @@ func (h5Pay *H5Pay) NewAppletPayRequest(body, detail, orderId, userIp, notifyUrl
 		NotifyUrl:      notifyUrl,
 		TradeType:      "JSAPI",
 		Openid:         openid,
-		SceneInfo:      string(sceneInfo),
+		SceneInfo:      "",
 	}
 }
 
@@ -175,9 +164,9 @@ func (h5Pay *H5Pay) NewAppletPayRequest(body, detail, orderId, userIp, notifyUrl
  * @params request AppletPayRequest
  * @return AppletPayRespones error
  */
-func (AppletPay *AppletPay) Pay(request AppletPayRequest) (miniResp *AppletPayRespones, err error) {
+func (appletPay *AppletPay) Pay(request AppletPayRequest) (miniResp *AppletPayRespones, err error) {
 	// 向微信发送请求
-	resp, err := AppletPay.wechatPay.Request(UNIFIED_ORDER, request)
+	resp, err := appletPay.wechatPay.Request(UNIFIED_ORDER, request)
 	if err != nil {
 		return nil, errors.New("请求异常:" + err.Error())
 	}
