@@ -4,6 +4,7 @@ import (
 	"crypto/md5"
 	"crypto/tls"
 	"crypto/x509"
+	"encoding/base64"
 	"encoding/xml"
 	"errors"
 	"fmt"
@@ -130,6 +131,36 @@ type RefundQueryRespones struct {
 	RefundAccount0       string `json:"refund_account_0" xml:"refund_account_0" structs:"refund_account_0"`
 	RefundRecvAccount0   string `json:"refund_recv_account_0" xml:"refund_recv_account_0" structs:"refund_recv_account_0"`
 	RefundSuccessTime0   string `json:"refund_success_time_0" xml:"refund_success_time_0" structs:"refund_success_time_0"`
+}
+
+// H5PayNotifyRequest 支付回调
+type PayNotifyRequest struct {
+	ReturnCode         string `json:"return_code" xml:"return_code, omitempty" structs:"return_code, omitempty"`
+	ReturnMsg          string `json:"return_msg" xml:"return_msg, omitempty" structs:"return_msg, omitempty"`
+	Appid              string `json:"appid" xml:"appid, omitempty" structs:"appid, omitempty"`
+	MchId              string `json:"mch_id" xml:"mch_id, omitempty"  structs:"mch_id, omitempty"`
+	DeviceInfo         string `json:"device_info" xml:"device_info, omitempty" structs:"device_info, omitempty"`
+	NonceStr           string `json:"nonce_str" xml:"nonce_str, omitempty" structs:"nonce_str, omitempty"`
+	Sign               string `json:"sign" xml:"sign, omitempty" structs:"sign, omitempty"`
+	SignType           string `json:"sign_type" xml:"sign_type, omitempty" structs:"sign_type, omitempty"`
+	ResultCode         string `json:"result_code" xml:"result_code, omitempty" structs:"result_code, omitempty"`
+	ErrCode            string `json:"err_code" xml:"err_code, omitempty" structs:"err_code, omitempty"`
+	ErrCodeDes         string `json:"err_code_des" xml:"err_code_des, omitempty" structs:"err_code_des, omitempty"`
+	Openid             string `json:"openid" xml:"openid, omitempty" structs:"openid, omitempty"`
+	IsSubscribe        string `json:"is_subscribe" xml:"is_subscribe, omitempty" structs:"is_subscribe, omitempty"`
+	TradeType          string `json:"trade_type" xml:"trade_type, omitempty" structs:"trade_type, omitempty"`
+	BankType           string `json:"bank_type" xml:"bank_type, omitempty" structs:"bank_type, omitempty"`
+	TotalFee           int    `json:"total_fee" xml:"total_fee, omitempty" structs:"total_fee, omitempty"`
+	SettlementTotalFee int    `json:"settlement_total_fee" xml:"settlement_total_fee, omitempty" structs:"settlement_total_fee, omitempty"`
+	FeeType            string `json:"fee_type" xml:"fee_type, omitempty" structs:"fee_type, omitempty"`
+	CashFee            int    `json:"cash_fee" xml:"cash_fee, omitempty" structs:"cash_fee, omitempty"`
+	CashFeeType        string `json:"cash_fee_type" xml:"cash_fee_type, omitempty" structs:"cash_fee_type, omitempty"`
+	CouponFee          string `json:"coupon_fee" xml:"coupon_fee, omitempty" structs:"coupon_fee, omitempty"`
+	CouponCount        string `json:"coupon_count" xml:"coupon_count, omitempty" structs:"coupon_count, omitempty"`
+	TransactionId      string `json:"transaction_id" xml:"transaction_id, omitempty" structs:"transaction_id, omitempty"`
+	OutTradeNo 		   string `json:"out_trade_no" xml:"out_trade_no, omitempty" structs:"out_trade_no, omitempty"`
+	Attach             string `json:"attach" xml:"attach, omitempty" structs:"attach, omitempty"`
+	TimeEnd            string `json:"time_end" xml:"time_end, omitempty" structs:"time_end, omitempty"`
 }
 
 /**
@@ -271,4 +302,65 @@ func (wechat *wechatPay) signData(data map[string]interface{}) (sign string, err
 	//3。将签名转化为大写
 	sign = strings.ToUpper(fmt.Sprintf("%x", m.Sum(nil)))
 	return
+}
+
+func (wechat *wechatPay) ParsePayNotifyRequest(request *http.Request) (notifyReq PayNotifyRequest, err error) {
+	err = xml.NewDecoder(request.Body).Decode(notifyReq)
+	if err != nil {
+		return
+	}
+	SingData := map[string]interface{}{
+		"return_code":          notifyReq.ReturnCode,
+		"return_msg":           notifyReq.ReturnMsg,
+		"appid":                notifyReq.Appid,
+		"mch_id":               notifyReq.MchId,
+		"device_info":          notifyReq.DeviceInfo,
+		"nonce_str":            notifyReq.NonceStr,
+		"sign":                 notifyReq.Sign,
+		"sign_type":            notifyReq.SignType,
+		"result_code":          notifyReq.ResultCode,
+		"err_code":             notifyReq.ErrCode,
+		"err_code_des":         notifyReq.ErrCodeDes,
+		"openid":               notifyReq.Openid,
+		"is_subscribe":         notifyReq.IsSubscribe,
+		"trade_type":           notifyReq.TradeType,
+		"bank_type":            notifyReq.BankType,
+		"total_fee":            notifyReq.TotalFee,
+		"settlement_total_fee": notifyReq.SettlementTotalFee,
+		"fee_type":             notifyReq.FeeType,
+		"cash_fee":             notifyReq.CashFee,
+		"cash_fee_type":        notifyReq.CashFeeType,
+		"coupon_fee":           notifyReq.CouponFee,
+		"coupon_count":         notifyReq.CouponCount,
+		"transaction_id":       notifyReq.TransactionId,
+		"out_trade_no":         notifyReq.OutTradeNo,
+		"attach":               notifyReq.Attach,
+		"time_end":             notifyReq.TimeEnd,
+	}
+	sign, err := wechat.signData(SingData)
+	if err != nil {
+		return
+	}
+	if sign != notifyReq.Sign {
+		return notifyReq, errors.New("验签失败:签名不一致")
+	}
+	return
+}
+
+func DecodeNotifyData(reqInfo string, paykey string) ([]byte, error) {
+	//1.对加密串A做base64解码，得到加密串B
+	b, err := base64.StdEncoding.DecodeString(reqInfo)
+	if err != nil {
+		return nil, err
+	}
+	//2.对商户key做md5，得到32位小写key
+	err = utils.SetAesKey(strings.ToLower(utils.Md5(paykey)))
+	if err != nil {
+		return nil, err
+	}
+
+	//3.用key*对加密串B做AES-256-ECB解密（PKCS7Padding）
+	plaintext, err := utils.AesECBDecrypt(b)
+
+	return plaintext, nil
 }
