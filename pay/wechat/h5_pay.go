@@ -122,7 +122,7 @@ func (h5Pay *H5Pay) Pay(request H5PayRequest) (h5Resp *H5PayRespones, err error)
 		return nil, err
 	}
 	//xml解码
-	err = xml.Unmarshal(respData, h5Resp)
+	err = xml.Unmarshal(respData, &h5Resp)
 	if err != nil {
 		return nil, err
 	}
