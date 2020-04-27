@@ -201,11 +201,11 @@ type MiniPayRefundQueryRespones struct {
 	ConponRefundFee0     int    `json:"conpon_refund_fee_0" xml:"conpon_refund_fee_0" structs:"conpon_refund_fee_0"`
 	ConponRefundCount0   int    `json:"conpon_refund_count_0" xml:"conpon_refund_count_0" structs:"conpon_refund_count_0"`
 	ConponRefundId00     string `json:"conpon_refund_id_0_0" xml:"conpon_refund_id_0_0" structs:"conpon_refund_id_0_0"`
-	ConponRefundFee00     string `json:"conpon_refund_fee_0_0" xml:"conpon_refund_fee_0_0" structs:"conpon_refund_fee_0_0"`
+	ConponRefundFee00    string `json:"conpon_refund_fee_0_0" xml:"conpon_refund_fee_0_0" structs:"conpon_refund_fee_0_0"`
 	RefundStatus0        string `json:"refund_status_0" xml:"refund_status_0" structs:"refund_status_0"`
 	RefundAccount0       string `json:"refund_account_0" xml:"refund_account_0" structs:"refund_account_0"`
-	RefundRecvAccount0   string  `json:"refund_recv_account_0" xml:"refund_recv_account_0" structs:"refund_recv_account_0"`
-	RefundSuccessTime0    string  `json:"refund_success_time_0" xml:"refund_success_time_0" structs:"refund_success_time_0"`
+	RefundRecvAccount0   string `json:"refund_recv_account_0" xml:"refund_recv_account_0" structs:"refund_recv_account_0"`
+	RefundSuccessTime0   string `json:"refund_success_time_0" xml:"refund_success_time_0" structs:"refund_success_time_0"`
 }
 
 func NewMiniPayClient(appid, mchid, key, apiclientKey, apiclientCert string) *MiniPay {
