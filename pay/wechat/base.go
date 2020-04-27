@@ -6,6 +6,7 @@ import (
 	"crypto/x509"
 	"errors"
 	"fmt"
+	"github.com/fatih/structs"
 	"github.com/mjd-pub/common_golang/utils"
 	"io"
 	"net/http"
@@ -95,7 +96,7 @@ func (wechat *wechatPay) Request(uri string, requestData interface{}) (resp *htt
 
 // DealXmlRequest 处理初xml请求body
 func (wechat *wechatPay) dealXmlRequest(params interface{}) (xmlRequest string, err error) {
-	paramsMap := utils.Struct2Map(params)
+	paramsMap := structs.Map(params)
 	// 对数据进行签名
 	sign, err := wechat.signData(paramsMap)
 	if err != nil {
