@@ -158,7 +158,7 @@ type PayNotifyRequest struct {
 	CouponFee          string `json:"coupon_fee" xml:"coupon_fee, omitempty" structs:"coupon_fee, omitempty"`
 	CouponCount        string `json:"coupon_count" xml:"coupon_count, omitempty" structs:"coupon_count, omitempty"`
 	TransactionId      string `json:"transaction_id" xml:"transaction_id, omitempty" structs:"transaction_id, omitempty"`
-	OutTradeNo 		   string `json:"out_trade_no" xml:"out_trade_no, omitempty" structs:"out_trade_no, omitempty"`
+	OutTradeNo         string `json:"out_trade_no" xml:"out_trade_no, omitempty" structs:"out_trade_no, omitempty"`
 	Attach             string `json:"attach" xml:"attach, omitempty" structs:"attach, omitempty"`
 	TimeEnd            string `json:"time_end" xml:"time_end, omitempty" structs:"time_end, omitempty"`
 }

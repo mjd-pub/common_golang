@@ -3,8 +3,10 @@ package wechat
 import (
 	"encoding/xml"
 	"errors"
+	"fmt"
 	"github.com/mjd-pub/common_golang/utils"
 	"io/ioutil"
+	"reflect"
 	"strconv"
 	"time"
 )
@@ -117,6 +119,17 @@ type AppletPayCloseRespones struct {
 	ErrCodeDes string `json:"err_code_des,omitempty" xml:"err_code_des,omitempty" structs:"err_code_des"`
 }
 
+// AppletPayFrontRequest 调起支付前端请求
+type AppletPayFrontRequest struct {
+	Appid     string `json:"appId"`
+	TimeStamp string `json:"timeStamp"`
+	NonceStr  string `json:"nonceStr"`
+	Package   string `json:"package"`
+	SignType  string `json:"signType"`
+	PaySign   string `json:"paySign"`
+	String    string `json:"string"`
+}
+
 func NewAppletPayClient(appid, mchid, key, apiclientKey, apiclientCert string) *AppletPay {
 	wechatPay := NewWechatPay(appid, mchid, key, apiclientKey, apiclientCert)
 	return &AppletPay{
@@ -164,23 +177,45 @@ func (appletPay *AppletPay) NewAppletPayRequest(body, detail, orderId, userIp, n
  * @params request AppletPayRequest
  * @return AppletPayRespones error
  */
-func (appletPay *AppletPay) Pay(request AppletPayRequest) (miniResp *AppletPayRespones, err error) {
+func (appletPay *AppletPay) Pay(request AppletPayRequest) (miniResp *AppletPayRespones, frontRequest *AppletPayFrontRequest, err error) {
 	// 向微信发送请求
 	resp, err := appletPay.wechatPay.Request(UNIFIED_ORDER, request)
 	if err != nil {
-		return nil, errors.New("请求异常:" + err.Error())
+		return nil, nil, errors.New("请求异常:" + err.Error())
 	}
 	if resp.StatusCode != 200 {
-		return nil, errors.New("httpCode Err:" + strconv.Itoa(resp.StatusCode))
+		return nil, nil, errors.New("httpCode Err:" + strconv.Itoa(resp.StatusCode))
 	}
 	respData, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		return
 	}
 	//xml解码
 	err = xml.Unmarshal(respData, &miniResp)
 	if err != nil {
-		return nil, err
+		return
+	}
+	sign2Data := map[string]interface{}{
+		"appId":     miniResp.Appid,
+		"timeStamp": strconv.Itoa(int(time.Now().Unix())),
+		"nonceStr":  utils.GetNonceStr(),
+		"package":   "prepay_id=" + miniResp.PrepayId,
+		"signType":  "MD5",
+	}
+	paySign, err := appletPay.wechatPay.signData(sign2Data)
+	if err != nil {
+		return
+	}
+	sign2Data["paySign"] = paySign
+	str := appletPay.toUrlParamsWechatApp(sign2Data)
+	frontRequest = &AppletPayFrontRequest{
+		Appid:     sign2Data["appId"].(string),
+		TimeStamp: sign2Data["timeStamp"].(string),
+		NonceStr:  sign2Data["nonceStr"].(string),
+		Package:   sign2Data["package"].(string),
+		SignType:  sign2Data["signType"].(string),
+		PaySign:   paySign,
+		String:    str,
 	}
 	return
 }
@@ -218,9 +253,9 @@ func (AppletPay *AppletPay) Query(request AppletPayQueryRequests) (queryResponse
  * @params request AppletPayCloseRequests
  * @return AppletPayCloseRespones err
  */
-func (AppletPay *AppletPay) Close(request AppletPayCloseRequests) (queryResponse *AppletPayCloseRespones, err error) {
+func (appletPay *AppletPay) Close(request AppletPayCloseRequests) (queryResponse *AppletPayCloseRespones, err error) {
 	// 向微信发送请求
-	resp, err := AppletPay.wechatPay.Request(ORDER_QUERY, request)
+	resp, err := appletPay.wechatPay.Request(ORDER_QUERY, request)
 	if err != nil {
 		return nil, errors.New("请求异常:" + err.Error())
 	}
@@ -237,4 +272,38 @@ func (AppletPay *AppletPay) Close(request AppletPayCloseRequests) (queryResponse
 		return nil, err
 	}
 	return
+}
+
+//格式化参数格式化成url参数
+func (appletPay *AppletPay) toUrlParamsWechatApp(data map[string]interface{}) string {
+	strs := utils.Ksort(data)
+	buff := ""
+	for _, str := range strs {
+		fmt.Println("key=", str, "value=", data[str], "type=", reflect.TypeOf(data[str]).Name())
+		if data[str] != "" {
+			switch reflect.TypeOf(data[str]).Name() {
+			case "int64":
+				if data[str].(int64) != 0 {
+					buff += str + "=" + strconv.Itoa(int(data[str].(int64))) + "&"
+				}
+				if str == "coupon_refund_count" || str == "coupon_refund_fee" {
+					buff += str + "=" + strconv.Itoa(int(data[str].(int64))) + "&"
+				}
+			case "int":
+				if data[str].(int) != 0 {
+					buff += str + "=" + strconv.Itoa(data[str].(int)) + "&"
+				}
+				if str == "coupon_refund_count" || str == "coupon_refund_fee" {
+					buff += str + "=" + strconv.Itoa(data[str].(int)) + "&"
+				}
+			case "float64":
+				temp := data[str].(float64)
+				buff += str + "=" + strconv.FormatFloat(temp, 'f', -1, 64) + "&"
+			case "string":
+				buff += str + "=" + data[str].(string) + "&"
+			}
+		}
+	}
+	buff = buff[:len(buff)-1] + "&key=" + appletPay.wechatPay.key
+	return buff
 }
