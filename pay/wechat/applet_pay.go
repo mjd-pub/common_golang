@@ -178,7 +178,7 @@ func (appletPay *AppletPay) Pay(request AppletPayRequest) (miniResp *AppletPayRe
 		return nil, err
 	}
 	//xml解码
-	err = xml.Unmarshal(respData, miniResp)
+	err = xml.Unmarshal(respData, &miniResp)
 	if err != nil {
 		return nil, err
 	}
