@@ -312,9 +312,14 @@ func (wechat *wechatPay) signData(data map[string]interface{}) (sign string, err
 }
 
 func (wechat *wechatPay) ParsePayNotifyRequest(request *http.Request) (notifyReq PayNotifyRequest, err error) {
-	err = xml.NewDecoder(request.Body).Decode(&notifyReq)
+	respData, err := ioutil.ReadAll(request.Body)
 	if err != nil {
 		return
+	}
+	//xml解码
+	err = xml.Unmarshal(respData, &notifyReq)
+	if err != nil {
+		return 
 	}
 	SingData := map[string]interface{}{
 		"return_code":          notifyReq.ReturnCode,
