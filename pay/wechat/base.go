@@ -316,6 +316,7 @@ func (wechat *wechatPay) ParsePayNotifyRequest(request *http.Request) (notifyReq
 	if err != nil {
 		return
 	}
+	fmt.Println(string(respData))
 	//xml解码
 	err = xml.Unmarshal(respData, &notifyReq)
 	if err != nil {
