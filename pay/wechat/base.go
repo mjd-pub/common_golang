@@ -135,32 +135,32 @@ type RefundQueryRespones struct {
 
 // H5PayNotifyRequest 支付回调
 type PayNotifyRequest struct {
-	ReturnCode         string `json:"return_code" xml:"return_code, omitempty" structs:"return_code, omitempty"`
-	ReturnMsg          string `json:"return_msg" xml:"return_msg, omitempty" structs:"return_msg, omitempty"`
-	Appid              string `json:"appid" xml:"appid, omitempty" structs:"appid, omitempty"`
-	MchId              string `json:"mch_id" xml:"mch_id, omitempty"  structs:"mch_id, omitempty"`
-	DeviceInfo         string `json:"device_info" xml:"device_info, omitempty" structs:"device_info, omitempty"`
-	NonceStr           string `json:"nonce_str" xml:"nonce_str, omitempty" structs:"nonce_str, omitempty"`
-	Sign               string `json:"sign" xml:"sign, omitempty" structs:"sign, omitempty"`
-	SignType           string `json:"sign_type" xml:"sign_type, omitempty" structs:"sign_type, omitempty"`
-	ResultCode         string `json:"result_code" xml:"result_code, omitempty" structs:"result_code, omitempty"`
-	ErrCode            string `json:"err_code" xml:"err_code, omitempty" structs:"err_code, omitempty"`
-	ErrCodeDes         string `json:"err_code_des" xml:"err_code_des, omitempty" structs:"err_code_des, omitempty"`
-	Openid             string `json:"openid" xml:"openid, omitempty" structs:"openid, omitempty"`
-	IsSubscribe        string `json:"is_subscribe" xml:"is_subscribe, omitempty" structs:"is_subscribe, omitempty"`
-	TradeType          string `json:"trade_type" xml:"trade_type, omitempty" structs:"trade_type, omitempty"`
-	BankType           string `json:"bank_type" xml:"bank_type, omitempty" structs:"bank_type, omitempty"`
-	TotalFee           int    `json:"total_fee" xml:"total_fee, omitempty" structs:"total_fee, omitempty"`
-	SettlementTotalFee int    `json:"settlement_total_fee" xml:"settlement_total_fee, omitempty" structs:"settlement_total_fee, omitempty"`
-	FeeType            string `json:"fee_type" xml:"fee_type, omitempty" structs:"fee_type, omitempty"`
-	CashFee            int    `json:"cash_fee" xml:"cash_fee, omitempty" structs:"cash_fee, omitempty"`
-	CashFeeType        string `json:"cash_fee_type" xml:"cash_fee_type, omitempty" structs:"cash_fee_type, omitempty"`
-	CouponFee          string `json:"coupon_fee" xml:"coupon_fee, omitempty" structs:"coupon_fee, omitempty"`
-	CouponCount        string `json:"coupon_count" xml:"coupon_count, omitempty" structs:"coupon_count, omitempty"`
-	TransactionId      string `json:"transaction_id" xml:"transaction_id, omitempty" structs:"transaction_id, omitempty"`
-	OutTradeNo         string `json:"out_trade_no" xml:"out_trade_no, omitempty" structs:"out_trade_no, omitempty"`
-	Attach             string `json:"attach" xml:"attach, omitempty" structs:"attach, omitempty"`
-	TimeEnd            string `json:"time_end" xml:"time_end, omitempty" structs:"time_end, omitempty"`
+	ReturnCode         string `json:"return_code" xml:"return_code" structs:"return_code"`
+	ReturnMsg          string `json:"return_msg" xml:"return_msg" structs:"return_msg"`
+	Appid              string `json:"appid" xml:"appid" structs:"appid"`
+	MchId              string `json:"mch_id" xml:"mch_id"  structs:"mch_id"`
+	DeviceInfo         string `json:"device_info" xml:"device_info" structs:"device_info"`
+	NonceStr           string `json:"nonce_str" xml:"nonce_str" structs:"nonce_str"`
+	Sign               string `json:"sign" xml:"sign" structs:"sign"`
+	SignType           string `json:"sign_type" xml:"sign_type" structs:"sign_type"`
+	ResultCode         string `json:"result_code" xml:"result_code" structs:"result_code, omitempty"`
+	ErrCode            string `json:"err_code" xml:"err_code" structs:"err_code, omitempty"`
+	ErrCodeDes         string `json:"err_code_des" xml:"err_code_des" structs:"err_code_des, omitempty"`
+	Openid             string `json:"openid" xml:"openid" structs:"openid, omitempty"`
+	IsSubscribe        string `json:"is_subscribe" xml:"is_subscribe" structs:"is_subscribe, omitempty"`
+	TradeType          string `json:"trade_type" xml:"trade_type" structs:"trade_type, omitempty"`
+	BankType           string `json:"bank_type" xml:"bank_type" structs:"bank_type, omitempty"`
+	TotalFee           int    `json:"total_fee" xml:"total_fee" structs:"total_fee, omitempty"`
+	SettlementTotalFee int    `json:"settlement_total_fee" xml:"settlement_total_fee" structs:"settlement_total_fee, omitempty"`
+	FeeType            string `json:"fee_type" xml:"fee_type" structs:"fee_type, omitempty"`
+	CashFee            int    `json:"cash_fee" xml:"cash_fee" structs:"cash_fee, omitempty"`
+	CashFeeType        string `json:"cash_fee_type" xml:"cash_fee_type" structs:"cash_fee_type, omitempty"`
+	CouponFee          string `json:"coupon_fee" xml:"coupon_fee" structs:"coupon_fee, omitempty"`
+	CouponCount        string `json:"coupon_count" xml:"coupon_count" structs:"coupon_count, omitempty"`
+	TransactionId      string `json:"transaction_id" xml:"transaction_id" structs:"transaction_id, omitempty"`
+	OutTradeNo         string `json:"out_trade_no" xml:"out_trade_no" structs:"out_trade_no, omitempty"`
+	Attach             string `json:"attach" xml:"attach" structs:"attach, omitempty"`
+	TimeEnd            string `json:"time_end" xml:"time_end" structs:"time_end, omitempty"`
 }
 
 // ServiceNotifyResponse 服务器主动回复微信
