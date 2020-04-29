@@ -311,16 +311,10 @@ func (wechat *wechatPay) signData(data map[string]interface{}) (sign string, err
 	return
 }
 
-func (wechat *wechatPay) ParsePayNotifyRequest(request *http.Request) (notifyReq PayNotifyRequest, err error) {
-	respData, err := ioutil.ReadAll(request.Body)
-	if err != nil {
-		return
-	}
-	//xml解码
-	err = xml.Unmarshal(respData, &notifyReq)
-	if err != nil {
-		return 
-	}
+func (wechat *wechatPay) ParsePayNotifyRequest(request *http.Request) (notifyReq *PayNotifyRequest, err error) {
+	defer request.Body.Close()
+	notifyReq = new(PayNotifyRequest)
+	err = xml.NewDecoder(request.Body).Decode(notifyReq)
 	SingData := map[string]interface{}{
 		"return_code":          notifyReq.ReturnCode,
 		"return_msg":           notifyReq.ReturnMsg,
