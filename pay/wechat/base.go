@@ -225,6 +225,24 @@ func (wechat *wechatPay) Request(uri string, requestData interface{}) (resp *htt
 	return
 }
 
+func (wechat *wechatPay) NewRefundRequests(outRefundNo, transactionId, businessId, notifyUrl string, totalFee, refundFee int) (request RefundRequests) {
+	return RefundRequests{
+		Appid:         wechat.appid,
+		MchId:         wechat.mchid,
+		TransactionId: transactionId,
+		OutTradeNo:    businessId,
+		NonceStr:      utils.GetNonceStr(),
+		SignType:      "MD5",
+		OutRefundNo:   outRefundNo,
+		TotalFee:      totalFee,
+		RefundFee:     refundFee,
+		RefundFeeType: "CNY",
+		RefundDesc:    "",
+		RefundAccount: "",
+		NotifyUrl:     notifyUrl,
+	}
+}
+
 /**
  * Refund 小程序申请退款
  *
@@ -232,6 +250,7 @@ func (wechat *wechatPay) Request(uri string, requestData interface{}) (resp *htt
  * @return AppletPayRefundRespones err
  */
 func (wechatPay *wechatPay) Refund(request RefundRequests) (queryResponse *RefundRespones, err error) {
+	queryResponse = new(RefundRespones)
 	// 向微信发送请求
 	resp, err := wechatPay.Request(REFUND, request)
 	if err != nil {
