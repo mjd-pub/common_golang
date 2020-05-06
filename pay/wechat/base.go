@@ -133,7 +133,7 @@ type RefundQueryRespones struct {
 	RefundSuccessTime0   string `json:"refund_success_time_0" xml:"refund_success_time_0" structs:"refund_success_time_0"`
 }
 
-// H5PayNotifyRequest 支付回调
+// PayNotifyRequest 支付回调
 type PayNotifyRequest struct {
 	ReturnCode         string `json:"return_code" xml:"return_code" structs:"return_code"`
 	ReturnMsg          string `json:"return_msg" xml:"return_msg" structs:"return_msg"`
@@ -161,6 +161,32 @@ type PayNotifyRequest struct {
 	OutTradeNo         string `json:"out_trade_no" xml:"out_trade_no" structs:"out_trade_no, omitempty"`
 	Attach             string `json:"attach" xml:"attach" structs:"attach, omitempty"`
 	TimeEnd            string `json:"time_end" xml:"time_end" structs:"time_end, omitempty"`
+}
+
+type RefundNotifyRequest struct {
+	ReturnCode          string `xml:"return_code,omitempty" json:"return_code,omitempty"`
+	ReturnMsg           string `xml:"return_msg,omitempty" json:"return_msg,omitempty"`
+	Appid               string `xml:"appid,omitempty" json:"appid,omitempty"`
+	MchId               string `xml:"mch_id,omitempty" json:"mch_id,omitempty"`
+	NonceStr            string `xml:"nonce_str,omitempty" json:"nonce_str,omitempty"`
+	ReqInfo             string `xml:"req_info,omitempty" json:"req_info,omitempty"`
+	UnmarshalReqInfo    RefundReqInfo  `json:"unmarshal_req_info" xml:"unmarshal_req_info"`
+}
+
+type RefundReqInfo struct {
+	TransactionId       string `xml:"transaction_id,omitempty" json:"transaction_id,omitempty"`
+	OutTradeNo          string `xml:"out_trade_no,omitempty" json:"out_trade_no,omitempty"`
+	RefundId            string `xml:"refund_id,omitempty" json:"refund_id,omitempty"`
+	OutRefundNo         string `xml:"out_refund_no,omitempty" json:"out_refund_no,omitempty"`
+	TotalFee            int    `xml:"total_fee,omitempty" json:"total_fee,omitempty"`
+	SettlementTotalFee  int    `xml:"settlement_total_fee,omitempty" json:"settlement_total_fee,omitempty"`
+	RefundFee           int    `xml:"refund_fee,omitempty" json:"refund_fee,omitempty"`
+	SettlementRefundFee int    `xml:"settlement_refund_fee,omitempty" json:"settlement_refund_fee,omitempty"`
+	RefundStatus        string `xml:"refund_status,omitempty" json:"refund_status,omitempty"`
+	SuccessTime         string `xml:"success_time,omitempty" json:"success_time,omitempty"`
+	RefundRecvAccout    string `xml:"refund_recv_accout,omitempty" json:"refund_recv_accout,omitempty"`
+	RefundAccount       string `xml:"refund_account,omitempty" json:"refund_account,omitempty"`
+	RefundRequestSource string `xml:"refund_request_source,omitempty" json:"refund_request_source,omitempty"`
 }
 
 // ServiceNotifyResponse 服务器主动回复微信
@@ -370,6 +396,27 @@ func (wechat *wechatPay) ParsePayNotifyRequest(request *http.Request) (notifyReq
 		return notifyReq, errors.New("验签失败:签名不一致")
 	}
 	return
+}
+
+func (wechat *wechatPay) ParseRefundRequest(request *http.Request) (notifyReq *RefundNotifyRequest, err error) {
+	defer request.Body.Close()
+	notifyReq = new(RefundNotifyRequest)
+	err = xml.NewDecoder(request.Body).Decode(notifyReq)
+	if err != nil {
+		return
+	}
+	//解码数据
+	respData, err := DecodeNotifyData(notifyReq.ReqInfo, wechat.key)
+	if err != nil {
+		return
+	}
+	reqInfo := new(RefundReqInfo)
+	//解码数据
+	err = xml.Unmarshal(respData, reqInfo)
+	if err != nil {
+		return
+	}
+	notifyReq.UnmarshalReqInfo = *reqInfo
 }
 
 func DecodeNotifyData(reqInfo string, paykey string) ([]byte, error) {
