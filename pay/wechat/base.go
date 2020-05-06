@@ -417,6 +417,8 @@ func (wechat *wechatPay) ParseRefundRequest(request *http.Request) (notifyReq *R
 		return
 	}
 	notifyReq.UnmarshalReqInfo = *reqInfo
+
+	return
 }
 
 func DecodeNotifyData(reqInfo string, paykey string) ([]byte, error) {
