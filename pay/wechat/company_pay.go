@@ -129,6 +129,7 @@ func (c *CompanyPay) Pay(request CompanyPayRequest) (queryResponse *CompanyPayRe
 	if err != nil {
 		return nil, err
 	}
+	queryResponse = new(CompanyPayResponse)
 	//xml解码
 	err = xml.Unmarshal(respData, queryResponse)
 	if err != nil {
